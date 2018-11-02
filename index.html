@@ -1,0 +1,36 @@
+<html>
+<head>
+<style>
+body {
+    background: black;
+}
+img {
+    height: 100%;
+    width: 100%;
+    image-rendering: auto;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+</style>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+</head>
+<body>
+<img src="images/.gif"/>
+
+<script>
+$(function() {
+	var images = [];
+	$.get("images").done((data) => images = data);
+	window.setInterval(() => {
+		if (images.length > 0) {
+			$("img").attr("src", "resized/" + images[Math.floor(Math.random() * images.length)]);
+		}
+		console.log("second")
+	}, 5000);
+});
+</script>
+</body>
+</html>
