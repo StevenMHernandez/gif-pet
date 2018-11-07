@@ -9,9 +9,10 @@ const resizeWidth = 64;
 var images = [];
 
 fs.readdir("images/original", function(err, items) {
-	images = items;
+	images = items.filter((filename) => filename != ".gitignore");
+console.log(images);
 
-	items.forEach(function(filename) {
+	images.forEach(function(filename) {
 		execFile(gifsicle, ['--resize-fit-width', resizeWidth, '-o', 'images/resized/' + filename, 'images/original/' + filename], err => {
 		  if (err) {
 		    throw err;
