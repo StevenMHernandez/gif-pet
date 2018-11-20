@@ -10,6 +10,7 @@
   "dependencies": {
     "express": "^4.16.4",
     "gifsicle": "^4.0.1",
+    "jquery": "^3.3.1",
     "npm": "^6.4.1",
     "zikes-circlemenu": "^0.1.1"
   }
