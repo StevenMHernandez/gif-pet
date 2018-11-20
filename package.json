@@ -2,7 +2,7 @@
   "name": "gif-pet",
   "version": "0.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,6 +10,7 @@
   "dependencies": {
     "express": "^4.16.4",
     "gifsicle": "^4.0.1",
-    "npm": "^6.4.1"
+    "npm": "^6.4.1",
+    "zikes-circlemenu": "^0.1.1"
   }
 }

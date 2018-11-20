@@ -1,6 +1,15 @@
 <html>
 <head>
 <style>
+* {
+    -webkit-user-select: none;
+    cursor: none;
+}
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
 body {
     background: black;
 }
@@ -11,26 +20,152 @@ img {
     image-rendering: crisp-edges;
     image-rendering: pixelated;
 }
+ul {
+    position: absolute;
+}
+ul li {
+    background: #999;
+}
+ul li.invisible {
+    background: none;
+}
+ul li a {
+    color: #efefef;
+    text-decoration: none;
+}
+.circleMenu-open {
+    transition: opacity 0.3s;
+    -webkit-transition: opacity 0.3s;
+    opacity: 1;
+}
+.circleMenu-closed {
+    transition: opacity 0.3s;
+    -webkit-transition: opacity 0.3s;
+
+    opacity: 0;
+}
 </style>
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
   crossorigin="anonymous"></script>
+<script src="zikes-circlemenu/jQuery.circleMenu.js"></script>
 </head>
 <body>
-<img src="images/.gif"/>
+<img draggable="false" src="images/.gif"/>
+<ul>
+  <li class="invisible"><a href="#"></a></li>
+  <li><a href="#">1</a></li>
+  <li><a href="#">2</a></li>
+  <li><a href="#">3</a></li>
+  <li><a href="#">4</a></li>
+  <li><a href="#">5</a></li>
+</ul>
 
 <script>
+var menuState = false;
+var simpleDebounce = 0;
+var ITEM_DIAMETER = 50;
+
+var HAPPY = "happy";
+var PLAY = "play";
+var WORK = "work";
+var FEED = "feed";
+var PARTY = "party";
+var STATIC = "static";
+var PET = "pet";
+var SAD = "sad";
+var HIGHFIVE = "highfive";
+
+var messages = {
+	WORK: "Time for work",
+	FEED: "Feed",
+	PARTY: "Let's Party",
+	PET: "Pet Pet",
+	HIGHFIVE: "High-Five"
+}
+
+var states = {
+	HAPPY: [HAPPY, SAD, STATIC],
+	SAD: [SAD, STATIC],
+	PLAY: [PLAY, HAPPY],
+	WORK: [WORK],
+	FEED: [HAPPY],
+	PARTY: [PARTY, HAPPY],
+	STATIC: [STATIC, HAPPY],
+	PET: [HAPPY, STATIC],
+	HIGHFIVE: [HAPPY, STATIC],
+}
+
+var menus = {
+	HAPPY: [FEED, PARTY, PET],
+	SAD: [FEED, PET, PLAY],
+	PLAY: [WORK],
+	WORK: [PLAY],
+	FEED: [HIGHFIVE],
+	PARTY: [WORK],
+	STATIC: [PARTY, HIGHFIVE],
+	PET: [PARTY],
+	HIGHFIVE: [PLAY],
+}
+
+var currentState = HAPPY;
+
+var images = [];
+
 $(function() {
-	var images = [];
-	$.get("images").done((data) => images = data);
-	window.setInterval(() => {
-		if (images.length > 0) {
-			$("img").attr("src", "resized/" + images[Math.floor(Math.random() * images.length)]);
-		}
-		console.log("second")
-	}, 5000);
+	$.get("images").done((data) => {
+		images = data
+
+		window.setInterval(() => {
+			currentState = states[currentState.toUpperCase()][Math.floor(Math.random() * states[currentState.toUpperCase()].length)];
+			renderCurrentState();
+		}, 10000);
+
+		$('ul').circleMenu({
+			item_diameter: ITEM_DIAMETER,
+			circle_radius: 100,
+			direction: 'full',
+		});
+
+		$('img').on('click', (e) => {
+			if (simpleDebounce + 100 < (new Date()).getTime()) {
+				simpleDebounce = (new Date()).getTime();
+
+				if (!menuState) {
+    				$('ul').empty();
+    				$('ul').append('<li></li>');
+    				menus[currentState.toUpperCase()].forEach((val) => {
+    					$('ul').append('<li onclick="changeState(\'' + val + '\')">' + val + '</li>');
+    				});
+
+                    $('ul').circleMenu('init');
+
+					$('ul').css('top', e.pageY - ITEM_DIAMETER/2);
+					$('ul').css('left', e.pageX - ITEM_DIAMETER/2);
+				}
+
+				$('ul').circleMenu(menuState ? 'close' : 'open');
+				menuState = !menuState;
+			}
+		});
+
+		renderCurrentState();
+	});
 });
+
+function renderCurrentState() {
+    var candidateImages = images.filter((file) => file.split(".")[0] == currentState);
+    var selectedImage = candidateImages[Math.floor(Math.random() * candidateImages.length)];
+    $('img').attr("src", "resized/" + selectedImage);
+}
+
+function changeState(state) {
+    $('ul').circleMenu('close');
+    currentState = state;
+    renderCurrentState();
+    menuState = false;
+}
 </script>
 </body>
 </html>
